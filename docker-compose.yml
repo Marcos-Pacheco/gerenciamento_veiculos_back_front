@@ -1,0 +1,47 @@
+version: '3'
+services:
+
+  #PHP Service
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: marcospacheco/php-8.2
+    container_name: app
+    restart: always
+    tty: true
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    #ports:
+    #  - "5173:5173"
+    networks:
+      - default
+      - database
+      
+  #Nginx Service Gerenciamento Loja
+  politram:
+    image: nginx:alpine
+    container_name: politram
+    restart: always
+    tty: true
+    ports:
+      - "86:80"
+      - "445:443"
+    volumes:
+      - ./:/var/www
+      - ./.docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - default
+      - database
+      
+#Docker Networks
+networks:
+  default:
+    driver: bridge
+  database:
+    name: database_database
+    external: true
